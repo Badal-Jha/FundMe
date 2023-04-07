@@ -18,8 +18,21 @@ contract FundMe {
         uint256[] donations;
     }
 
+    //Request[] public requests;
+//   Campaign[] public campaigns;
+//   address public manager;
+//   uint public minimunContribution;
+//   string public CampaignName;
+//   string public CampaignDescription;
+//   string public imageUrl;
+//   uint public targetToAchieve;
+//   address[] public contributers;
+//   mapping(address => bool) public approvers;
+//   uint public approversCount;
+
     mapping(uint256 => Campaign) public campaigns;
 
+  //function to create campaign
 
     function createCampaign(address _owner, string memory _title, string memory _description, uint256 _target, uint256 _deadline, string memory _image) public returns (uint256) {
         Campaign storage campaign = campaigns[totalCompaigns];
@@ -39,6 +52,7 @@ contract FundMe {
         return totalCompaigns - 1;
     }
 
+   
     function donateToCampaign(uint256 _id) public payable {
         uint256 amount = msg.value;
 
@@ -54,10 +68,13 @@ contract FundMe {
         }
     }
 
+
+//get list of donars
     function getDonators(uint256 _id) view public returns (address[] memory, uint256[] memory) {
         return (campaigns[_id].donators, campaigns[_id].donations);
     }
 
+//get all the campaigns
     function getCampaigns() public view returns (Campaign[] memory) {
         Campaign[] memory allCampaigns = new Campaign[](totalCompaigns);
 
