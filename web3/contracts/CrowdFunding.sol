@@ -1,41 +1,25 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-contract FundMe {
-   //it store total number of compaigns
-     uint256 public totalCompaigns = 0;
-
-    //structure of Campaign
+contract CrowdFunding {
     struct Campaign {
         address owner;
         string title;
         string description;
+        uint256 target;
         uint256 deadline;
         uint256 amountCollected;
         string image;
-        uint256 target;
         address[] donators;
         uint256[] donations;
     }
 
-    //Request[] public requests;
-//   Campaign[] public campaigns;
-//   address public manager;
-//   uint public minimunContribution;
-//   string public CampaignName;
-//   string public CampaignDescription;
-//   string public imageUrl;
-//   uint public targetToAchieve;
-//   address[] public contributers;
-//   mapping(address => bool) public approvers;
-//   uint public approversCount;
-
     mapping(uint256 => Campaign) public campaigns;
 
-  //function to create campaign
+    uint256 public numberOfCampaigns = 0;
 
     function createCampaign(address _owner, string memory _title, string memory _description, uint256 _target, uint256 _deadline, string memory _image) public returns (uint256) {
-        Campaign storage campaign = campaigns[totalCompaigns];
+        Campaign storage campaign = campaigns[numberOfCampaigns];
 
         require(campaign.deadline < block.timestamp, "The deadline should be a date in the future.");
 
@@ -47,12 +31,11 @@ contract FundMe {
         campaign.amountCollected = 0;
         campaign.image = _image;
 
-        totalCompaigns++;
+        numberOfCampaigns++;
 
-        return totalCompaigns - 1;
+        return numberOfCampaigns - 1;
     }
 
-   
     function donateToCampaign(uint256 _id) public payable {
         uint256 amount = msg.value;
 
@@ -68,17 +51,14 @@ contract FundMe {
         }
     }
 
-
-//get list of donars
     function getDonators(uint256 _id) view public returns (address[] memory, uint256[] memory) {
         return (campaigns[_id].donators, campaigns[_id].donations);
     }
 
-//get all the campaigns
     function getCampaigns() public view returns (Campaign[] memory) {
-        Campaign[] memory allCampaigns = new Campaign[](totalCompaigns);
+        Campaign[] memory allCampaigns = new Campaign[](numberOfCampaigns);
 
-        for(uint i = 0; i < totalCompaigns; i++) {
+        for(uint i = 0; i < numberOfCampaigns; i++) {
             Campaign storage item = campaigns[i];
 
             allCampaigns[i] = item;
