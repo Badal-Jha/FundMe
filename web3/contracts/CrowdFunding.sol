@@ -66,4 +66,29 @@ contract CrowdFunding {
 
         return allCampaigns;
     }
+
+    function withdrawFunds(uint256 _campaignID) public {
+        // <-- only available for Campaign creator, if funds were fully raised
+
+        Campaign storage campaign = campaigns[_campaignID];
+        require(campaign.campaignID != 0, "Campaign does not exist.");
+        require(
+            campaign.amountCollected >= campaign.raisingGoal,
+            "Campaign goal has not been reached."
+        ); // <-- check fund goal
+        require(
+            msg.sender == campaign.owner,
+            "Only the campaign creator can withdraw funds."
+        ); // <-- check caller's adress, fail if not owner
+
+        uint256 commission = (campaign.amountCollected * 5) / 100; // <-- calculate comission
+        uint256 withdrawalAmount = campaign.amountCollected - commission; // <-- calculate withdrawalAmount
+        (bool sent, ) = campaign.owner.call{value: withdrawalAmount}(""); // <-- withdraw funds only for called Campaign, returns 'sent' on success
+        require(sent, "ETH Withdrawal failed"); // <-- if no 'sent', return an error
+
+        (bool commissioned, ) = deployer.call{value: commission}(""); // <-- same but for comission
+        require(commissioned, "Commission transfer failed");
+
+        delete campaigns[_campaignID]; // <-- remove our withdrawn Campaign from our mapping storage
+    }
 }

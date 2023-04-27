@@ -78,6 +78,10 @@ export const StateContextProvider = ({ children }) => {
         return parsedDonations;
     }
 
+    const withdraw = async (pId) => {
+        const data = await contract.call('withdrawFunds', [pId])
+    }
+
 
     return (
         <StateContext.Provider
@@ -89,7 +93,8 @@ export const StateContextProvider = ({ children }) => {
                 getCampaigns,
                 getUserCampaigns,
                 donate,
-                getDonations
+                getDonations,
+                withdraw
             }}
         >
             {children}
