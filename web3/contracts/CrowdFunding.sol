@@ -58,6 +58,7 @@ contract CrowdFunding {
     function getCampaigns() public view returns (Campaign[] memory) {
         Campaign[] memory allCampaigns = new Campaign[](numberOfCampaigns);
 
+
         for(uint i = 0; i < numberOfCampaigns; i++) {
             Campaign storage item = campaigns[i];
 
@@ -73,9 +74,12 @@ contract CrowdFunding {
             campaign.amountCollected >= campaign.target,
             "Campaign goal has not been reached."
         );
+        require(
+            msg.sender == campaign.owner,
+            "Only the campaign creator can withdraw funds."
+        );
         bool condition  = payable(campaign.owner).send(campaign.target);
          require(condition, "Error message string");
         delete campaigns[_campaignID];
     }
 }
-
