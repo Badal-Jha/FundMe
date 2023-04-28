@@ -6,11 +6,21 @@ import { ethers } from 'ethers';
 const StateContext = createContext();
 
 export const StateContextProvider = ({ children }) => {
-    const { contract } = useContract('0x6e32211b04199e1F2E63F0bBA959a9b1B6Db36ec');
+    const { contract } = useContract('0xa65E4389AD326143Cd186e4397ae817dC444382f');
     const { mutateAsync: createCampaign } = useContractWrite(contract, 'createCampaign');
+    const { mutateAsync: makePayment } = useContractWrite(contract, 'makePayment');
 
     const address = useAddress();
     const connect = useMetamask();
+
+    const withdraw = async (pId) => {
+        const _campaign = await getCampaigns();
+        console.log(_campaign)
+        const campaign = _campaign[pId];
+        console.log(campaign)
+        const data = await contract.call('makePayment', [pId], { value: ethers.utils.parseEther(campaign.amountCollected) });
+        return data;
+    }
 
     const publishCampaign = async (form) => {
         try {
@@ -33,7 +43,7 @@ export const StateContextProvider = ({ children }) => {
     const getCampaigns = async () => {
         const campaigns = await contract.call('getCampaigns');
 
-        const parsedCampaings = campaigns.map((campaign, i) => ({
+        const parsedCampaigns = campaigns.map((campaign, i) => ({
             owner: campaign.owner,
             title: campaign.title,
             description: campaign.description,
@@ -44,7 +54,9 @@ export const StateContextProvider = ({ children }) => {
             pId: i
         }));
 
-        return parsedCampaings;
+        const filteredCampaigns = parsedCampaigns.filter((campaign) => campaign.title != '');
+
+        return filteredCampaigns;
     }
 
     const getUserCampaigns = async () => {
@@ -62,7 +74,7 @@ export const StateContextProvider = ({ children }) => {
     }
 
     const getDonations = async (pId) => {
-        console.log(pId,3)
+        console.log(pId, 3)
         const donations = await contract.call('getDonators', [pId]);
         const numberOfDonations = donations[0].length;
 
@@ -76,10 +88,6 @@ export const StateContextProvider = ({ children }) => {
         }
 
         return parsedDonations;
-    }
-
-    const withdraw = async (pId) => {
-        const data = await contract.call('withdrawFunds', [pId])
     }
 
 

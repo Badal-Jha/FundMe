@@ -10,7 +10,7 @@ import { thirdweb } from '../assets';
 const CampaignDetails = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const { donate, getDonations, contract, address } = useStateContext();
+    const { donate, getDonations, contract, address, withdraw } = useStateContext();
 
     const [isLoading, setIsLoading] = useState(false);
     const [amount, setAmount] = useState('');
@@ -36,11 +36,10 @@ const CampaignDetails = () => {
         navigate('/')
         setIsLoading(false);
     }
+
     const handleWithdraw = async () => {
         setIsLoading(true);
-
-        await winthdraw(state.pId);
-
+        await withdraw(state.pId);
         navigate('/')
         setIsLoading(false);
     }
@@ -127,7 +126,7 @@ const CampaignDetails = () => {
                             </div>
 
                             {
-                                calculateBarPercentage(state.target, state.amountCollected) < 100?
+                                (calculateBarPercentage(state.target, state.amountCollected) < 100 )|| (state.owner !== address) ?
                                     (
                                         <CustomButton
                                             btnType="button"
