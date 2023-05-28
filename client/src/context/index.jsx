@@ -45,7 +45,8 @@ export const StateContextProvider = ({ children }) => {
             const obj = {
                 id: id,
                 numContributers: 0,
-                voters: [-1]
+                voters: [-1],
+                contributors: [-1]
             }
             localStorage.setItem(id, JSON.stringify(obj));
             console.log(JSON.parse(localStorage.getItem(id)));
@@ -90,6 +91,7 @@ export const StateContextProvider = ({ children }) => {
     const donate = async (pId, id, amount) => {
         const data = await contract.call('donateToCampaign', [pId], { value: ethers.utils.parseEther(amount) });
         const obj = JSON.parse(localStorage.getItem(id));
+      
         obj.numContributers++;
         localStorage.setItem(id, JSON.stringify(obj));
         return data;
